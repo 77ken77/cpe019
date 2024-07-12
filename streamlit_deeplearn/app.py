@@ -74,7 +74,9 @@ def load_emnist(images_path, labels_path):
     with open(images_path, 'rb') as imgpath:
         images = np.frombuffer(imgpath.read(), dtype=np.uint8, offset=16)
         st.write(f"Total number of bytes in images array: {images.size}")
+        st.write(f"Content of images array: {images[:100]}")
         num_images = images.size // (28 * 28)
+        st.write(f"Number of images calculated: {num_images}")
         images = images.reshape((num_images, 28, 28))
         
     return images, labels
