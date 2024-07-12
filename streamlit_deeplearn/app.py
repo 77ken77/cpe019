@@ -8,8 +8,11 @@ import requests
 from streamlit_drawable_canvas import st_canvas
 from PIL import Image
 
-# URL of the new dataset file on Google Drive
+# URLs of the dataset files on Google Drive
 images_url = 'https://drive.google.com/uc?export=download&id=1eKJDJ1O8sMU-nKYCDBmA_hSXxHkCaGQ5'
+labels_url = 'https://drive.google.com/uc?export=download&id=1eKJDJ1O8sMU-nKYCDBmA_hSXxHkCaGQ5'
+test_images_url = 'https://drive.google.com/uc?export=download&id=<test_images_id>'
+test_labels_url = 'https://drive.google.com/uc?export=download&id=<test_labels_id>'
 
 images_path = 'emnist-letters-train-images-idx3-ubyte'
 labels_path = 'emnist-letters-train-labels-idx1-ubyte'
@@ -34,10 +37,22 @@ def download_file_from_google_drive(url, destination):
         for chunk in response.iter_content(32768):
             f.write(chunk)
 
-# Download the images file if it does not exist
+# Download the files if they do not exist
 if not os.path.exists(images_path):
-    with st.spinner("Downloading images file..."):
+    with st.spinner("Downloading train images file..."):
         download_file_from_google_drive(images_url, images_path)
+
+if not os.path.exists(labels_path):
+    with st.spinner("Downloading train labels file..."):
+        download_file_from_google_drive(labels_url, labels_path)
+
+if not os.path.exists(test_images_path):
+    with st.spinner("Downloading test images file..."):
+        download_file_from_google_drive(test_images_url, test_images_path)
+
+if not os.path.exists(test_labels_path):
+    with st.spinner("Downloading test labels file..."):
+        download_file_from_google_drive(test_labels_url, test_labels_path)
 
 # Verify if the files exist
 def verify_files_exist(file_paths):
