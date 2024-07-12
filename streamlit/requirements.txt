@@ -1,8 +1,6 @@
-tensorflow==2.10
-mltu==0.1.5
 streamlit
-stow
-tqdm
-requests
-Pillow
+onnxruntime
 opencv-python-headless
+streamlit-drawable-canvas
+numpy
+Pillow
