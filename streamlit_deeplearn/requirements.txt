@@ -1,6 +1,0 @@
-streamlit
-tensorflow==2.17.0
-numpy
-requests
-streamlit-drawable-canvas
-Pillow
