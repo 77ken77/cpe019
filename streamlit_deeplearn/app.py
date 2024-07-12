@@ -9,9 +9,12 @@ import gzip
 from streamlit_drawable_canvas import st_canvas
 from PIL import Image
 
-# URL of the dataset file on Google Drive
-dataset_url = 'https://drive.google.com/uc?export=download&id=1SKjgdI4-t72-njFZFp1zXuKUDP2NwbYD'
-dataset_path = 'emnist-letters-train-images-idx3-ubyte.gz'
+# URLs of the dataset files on Google Drive
+images_url = 'https://drive.google.com/uc?export=download&id=1SKjgdI4-t72-njFZFp1zXuKUDP2NwbYD'
+labels_url = 'https://drive.google.com/uc?export=download&id=1R9j8F0LTQYsyK3YthqThLk5Fg5IcqkmR' # example link, replace with actual link
+
+images_path = 'emnist-letters-train-images-idx3-ubyte.gz'
+labels_path = 'emnist-letters-train-labels-idx1-ubyte.gz'
 
 # Function to download file from Google Drive
 def download_file_from_google_drive(url, destination):
@@ -31,10 +34,15 @@ def download_file_from_google_drive(url, destination):
         for chunk in response.iter_content(32768):
             f.write(chunk)
 
-# Download the dataset if it does not exist
-if not os.path.exists(dataset_path):
-    with st.spinner("Downloading dataset..."):
-        download_file_from_google_drive(dataset_url, dataset_path)
+# Download the images file if it does not exist
+if not os.path.exists(images_path):
+    with st.spinner("Downloading images file..."):
+        download_file_from_google_drive(images_url, images_path)
+
+# Download the labels file if it does not exist
+if not os.path.exists(labels_path):
+    with st.spinner("Downloading labels file..."):
+        download_file_from_google_drive(labels_url, labels_path)
 
 # Helper function to load EMNIST data
 def load_emnist(images_path, labels_path):
@@ -46,12 +54,8 @@ def load_emnist(images_path, labels_path):
         
     return images, labels
 
-# Ensure that the labels file is available too
-labels_path = 'emnist-letters-train-labels-idx1-ubyte.gz'
-# You can add similar code to download the labels file if necessary
-
 # Load the dataset
-x_train_emnist, y_train_emnist = load_emnist(dataset_path, labels_path)
+x_train_emnist, y_train_emnist = load_emnist(images_path, labels_path)
 
 # Load and preprocess other data as before
 # Load MNIST data
@@ -73,3 +77,39 @@ y_train_emnist += 9
 # Combine datasets
 x_train = np.concatenate([x_train_mnist, x_train_emnist], axis=0)
 y_train = np.concatenate([y_train_mnist, y_train_emnist], axis=0)
+
+# Load the model
+model_path = 'digit_letter_classifier.h5'
+model = load_model(model_path)
+
+st.title("Digit and Letter Classifier")
+st.write("Draw a digit or a letter and click 'Predict' to see the prediction.")
+
+# Create a canvas component
+canvas_result = st_canvas(
+    fill_color="#000000",  # Fixed fill color with some opacity
+    stroke_width=10,
+    stroke_color="#FFFFFF",
+    background_color="#000000",
+    height=280,
+    width=280,
+    drawing_mode="freedraw",
+    key="canvas",
+)
+
+if canvas_result.image_data is not None:
+    # Preprocess the drawn image
+    img = Image.fromarray(canvas_result.image_data.astype('uint8'), 'RGBA').convert('L')
+    img = img.resize((28, 28))
+    img = np.array(img)
+    img = np.expand_dims(img, axis=0)
+    img = img / 255.0
+
+    # Predict the class
+    if st.button("Predict"):
+        prediction = model.predict(img)
+        class_idx = np.argmax(prediction)
+        if class_idx < 10:
+            st.write(f"Prediction: {class_idx} (Digit)")
+        else:
+            st.write(f"Prediction: {chr(class_idx + 87)} (Letter)")
