@@ -39,6 +39,18 @@ if not os.path.exists(images_path):
     with st.spinner("Downloading images file..."):
         download_file_from_google_drive(images_url, images_path)
 
+# Verify if the files exist
+def verify_files_exist(file_paths):
+    for file_path in file_paths:
+        if not os.path.exists(file_path):
+            st.error(f"The file {file_path} does not exist.")
+            return False
+    return True
+
+file_paths = [images_path, labels_path, test_images_path, test_labels_path]
+if not verify_files_exist(file_paths):
+    st.stop()
+
 # Helper function to load EMNIST data from uncompressed files
 def load_emnist(images_path, labels_path):
     with open(labels_path, 'rb') as lbpath:
@@ -49,9 +61,13 @@ def load_emnist(images_path, labels_path):
         
     return images, labels
 
-# Load the dataset
-x_train_emnist, y_train_emnist = load_emnist(images_path, labels_path)
-x_test_emnist, y_test_emnist = load_emnist(test_images_path, test_labels_path)
+try:
+    # Load the dataset
+    x_train_emnist, y_train_emnist = load_emnist(images_path, labels_path)
+    x_test_emnist, y_test_emnist = load_emnist(test_images_path, test_labels_path)
+except Exception as e:
+    st.error(f"An error occurred while loading the dataset: {e}")
+    st.stop()
 
 # Load and preprocess other data as before
 # Load MNIST data
