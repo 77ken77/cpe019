@@ -9,12 +9,13 @@ import gzip
 from streamlit_drawable_canvas import st_canvas
 from PIL import Image
 
-# URLs of the dataset files on Google Drive
+# URL of the dataset file on Google Drive
 images_url = 'https://drive.google.com/uc?export=download&id=1SKjgdI4-t72-njFZFp1zXuKUDP2NwbYD'
-labels_url = 'https://drive.google.com/uc?export=download&id=1R9j8F0LTQYsyK3YthqThLk5Fg5IcqkmR' # example link, replace with actual link
 
 images_path = 'emnist-letters-train-images-idx3-ubyte.gz'
 labels_path = 'emnist-letters-train-labels-idx1-ubyte.gz'
+test_images_path = 'emnist-letters-test-images-idx3-ubyte.gz'
+test_labels_path = 'emnist-letters-test-labels-idx1-ubyte.gz'
 
 # Function to download file from Google Drive
 def download_file_from_google_drive(url, destination):
@@ -39,10 +40,24 @@ if not os.path.exists(images_path):
     with st.spinner("Downloading images file..."):
         download_file_from_google_drive(images_url, images_path)
 
-# Download the labels file if it does not exist
-if not os.path.exists(labels_path):
-    with st.spinner("Downloading labels file..."):
-        download_file_from_google_drive(labels_url, labels_path)
+# Verify if the downloaded files are valid gzip files
+def is_valid_gzip(file_path):
+    try:
+        with gzip.open(file_path, 'rb') as f:
+            f.read(1)
+        return True
+    except Exception as e:
+        return False
+
+# Verify the gzip files
+if not is_valid_gzip(images_path):
+    st.error(f"The file {images_path} is not a valid gzip file.")
+if not is_valid_gzip(labels_path):
+    st.error(f"The file {labels_path} is not a valid gzip file.")
+if not is_valid_gzip(test_images_path):
+    st.error(f"The file {test_images_path} is not a valid gzip file.")
+if not is_valid_gzip(test_labels_path):
+    st.error(f"The file {test_labels_path} is not a valid gzip file.")
 
 # Helper function to load EMNIST data
 def load_emnist(images_path, labels_path):
@@ -56,6 +71,7 @@ def load_emnist(images_path, labels_path):
 
 # Load the dataset
 x_train_emnist, y_train_emnist = load_emnist(images_path, labels_path)
+x_test_emnist, y_test_emnist = load_emnist(test_images_path, test_labels_path)
 
 # Load and preprocess other data as before
 # Load MNIST data
@@ -71,12 +87,17 @@ x_train_mnist, y_train_mnist = preprocess_data(x_train_mnist, y_train_mnist)
 x_test_mnist, y_test_mnist = preprocess_data(x_test_mnist, y_test_mnist)
 
 x_train_emnist, y_train_emnist = preprocess_data(x_train_emnist, y_train_emnist)
+x_test_emnist, y_test_emnist = preprocess_data(x_test_emnist, y_test_emnist)
 # Shift EMNIST labels to avoid collision with MNIST labels (0-9)
 y_train_emnist += 9
+y_test_emnist += 9
 
 # Combine datasets
 x_train = np.concatenate([x_train_mnist, x_train_emnist], axis=0)
 y_train = np.concatenate([y_train_mnist, y_train_emnist], axis=0)
+
+x_test = np.concatenate([x_test_mnist, x_test_emnist], axis=0)
+y_test = np.concatenate([y_test_mnist, y_test_emnist], axis=0)
 
 # Load the model
 model_path = 'digit_letter_classifier.h5'
