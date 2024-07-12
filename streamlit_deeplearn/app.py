@@ -3,23 +3,40 @@ import tensorflow as tf
 from tensorflow.keras.models import load_model
 from tensorflow.keras.preprocessing import image
 import numpy as np
+import os
+import requests
+import gzip
 
-model = load_model('digit_letter_classifier.h5')
+# URL of the dataset file on Google Drive
+dataset_url = 'https://drive.google.com/uc?export=download&id=1SKjgdI4-t72-njFZFp1zXuKUDP2NwbYD'
+dataset_path = 'emnist-letters-train-images-idx3-ubyte.gz'
 
-st.title("Digit and Letter Classifier")
-st.write("Upload an image of a handwritten digit or letter.")
+# Function to download file from Google Drive
+def download_file_from_google_drive(url, destination):
+    session = requests.Session()
+    response = session.get(url, stream=True)
+    token = None
 
-uploaded_file = st.file_uploader("Choose an image...", type="png")
+    for key, value in response.cookies.items():
+        if key.startswith('download_warning'):
+            token = value
 
-if uploaded_file is not None:
-    img = image.load_img(uploaded_file, target_size=(28, 28), color_mode="grayscale")
-    img = image.img_to_array(img)
-    img = np.expand_dims(img, axis=0)
-    img = img / 255.0
+    if token:
+        url = url + '&confirm=' + token
+        response = session.get(url, stream=True)
 
-    prediction = model.predict(img)
-    class_idx = np.argmax(prediction)
-    if class_idx < 10:
-        st.write(f"Prediction: {class_idx} (Digit)")
-    else:
-        st.write(f"Prediction: {chr(class_idx + 87)} (Letter)")
+    with open(destination, 'wb') as f:
+        for chunk in response.iter_content(32768):
+            f.write(chunk)
+
+# Download the dataset if it does not exist
+if not os.path.exists(dataset_path):
+    with st.spinner("Downloading dataset..."):
+        download_file_from_google_drive(dataset_url, dataset_path)
+
+# Helper function to load EMNIST data
+def load_emnist(images_path, labels_path):
+    with gzip.open(labels_path, 'rb') as lbpath:
+        labels = np.frombuffer(lbpath.read(), dtype=np.uint8, offset=8)
+        
+  
