@@ -10,9 +10,9 @@ from PIL import Image
 
 # URLs of the dataset files on Google Drive
 train_images_url = 'https://drive.google.com/uc?export=download&id=1rUpJ8Tg6JqFDLgBKPbQ6xG9HnUFOhM4k'
-train_labels_url = 'https://drive.google.com/uc?export=download&id=1rW7vE2ARgfQo9WyfWe9lAcWUP8D5j3t4'
+train_labels_url = 'https://drive.google.com/uc?export=download&id=1WJ9rypG6NRF94pVsMQ54DtGH82FSLwHM'
 test_images_url = 'https://drive.google.com/uc?export=download&id=1sDDcdlZAZLQU7Mv0YjFW8NVbS05dRzkU'
-test_labels_url = 'https://drive.google.com/uc?export=download&id=1_uItDT3-7nFVcdPNE1glOf3tmVfZyeRs'
+test_labels_url = 'https://drive.google.com/uc?export=download&id=1tUCfLy3RrxtMrO3XhVtCS5t1lNE-R5qP'
 
 train_images_path = 'emnist-letters-train-images-idx3-ubyte'
 train_labels_path = 'emnist-letters-train-labels-idx1-ubyte'
