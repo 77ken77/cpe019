@@ -1,3 +1,5 @@
 streamlit
 tensorflow
 numpy
+requests
+streamlit-drawable-canvas
