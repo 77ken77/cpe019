@@ -72,7 +72,9 @@ def load_emnist(images_path, labels_path):
         labels = np.frombuffer(lbpath.read(), dtype=np.uint8, offset=8)
         
     with open(images_path, 'rb') as imgpath:
-        images = np.frombuffer(imgpath.read(), dtype=np.uint8, offset=16).reshape(len(labels), 28, 28)
+        images = np.frombuffer(imgpath.read(), dtype=np.uint8, offset=16)
+        num_images = images.shape[0] // (28 * 28)
+        images = images.reshape((num_images, 28, 28))
         
     return images, labels
 
@@ -80,6 +82,12 @@ try:
     # Load the dataset
     x_train_emnist, y_train_emnist = load_emnist(images_path, labels_path)
     x_test_emnist, y_test_emnist = load_emnist(test_images_path, test_labels_path)
+    
+    # Debugging statements
+    st.write(f"x_train_emnist shape: {x_train_emnist.shape}")
+    st.write(f"y_train_emnist shape: {y_train_emnist.shape}")
+    st.write(f"x_test_emnist shape: {x_test_emnist.shape}")
+    st.write(f"y_test_emnist shape: {y_test_emnist.shape}")
 except Exception as e:
     st.error(f"An error occurred while loading the dataset: {e}")
     st.stop()
