@@ -4,7 +4,6 @@ from tensorflow.keras.models import load_model
 from tensorflow.keras.preprocessing import image
 import numpy as np
 
-# Load the model
 model = load_model('digit_letter_classifier.h5')
 
 st.title("Digit and Letter Classifier")
