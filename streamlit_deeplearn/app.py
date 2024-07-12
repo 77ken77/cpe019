@@ -11,13 +11,13 @@ from PIL import Image
 # URLs of the dataset files on Google Drive
 train_images_url = 'https://drive.google.com/uc?export=download&id=1eKJDJ1O8sMU-nKYCDBmA_hSXxHkCaGQ5'
 train_labels_url = 'https://drive.google.com/uc?export=download&id=<train_labels_id>'
-test_images_url = 'https://drive.google.com/uc?export=download&id=<test_images_id>'
-test_labels_url = 'https://drive.google.com/uc?export=download&id=<test_labels_id>'
+# test_images_url = 'https://drive.google.com/uc?export=download&id=<test_images_id>'
+# test_labels_url = 'https://drive.google.com/uc?export=download&id=<test_labels_id>'
 
 train_images_path = 'emnist-letters-train-images-idx3-ubyte'
 train_labels_path = 'emnist-letters-train-labels-idx1-ubyte'
-test_images_path = 'emnist-letters-test-images-idx3-ubyte'
-test_labels_path = 'emnist-letters-test-labels-idx1-ubyte'
+# test_images_path = 'emnist-letters-test-images-idx3-ubyte'
+# test_labels_path = 'emnist-letters-test-labels-idx1-ubyte'
 
 # Function to download file from Google Drive
 def download_file_from_google_drive(url, destination):
@@ -46,13 +46,13 @@ if not os.path.exists(train_labels_path):
     with st.spinner("Downloading train labels file..."):
         download_file_from_google_drive(train_labels_url, train_labels_path)
 
-if not os.path.exists(test_images_path):
-    with st.spinner("Downloading test images file..."):
-        download_file_from_google_drive(test_images_url, test_images_path)
+# if not os.path.exists(test_images_path):
+#     with st.spinner("Downloading test images file..."):
+#         download_file_from_google_drive(test_images_url, test_images_path)
 
-if not os.path.exists(test_labels_path):
-    with st.spinner("Downloading test labels file..."):
-        download_file_from_google_drive(test_labels_url, test_labels_path)
+# if not os.path.exists(test_labels_path):
+#     with st.spinner("Downloading test labels file..."):
+#         download_file_from_google_drive(test_labels_url, test_labels_path)
 
 # Verify if the files exist
 def verify_files_exist(file_paths):
@@ -62,7 +62,7 @@ def verify_files_exist(file_paths):
             return False
     return True
 
-file_paths = [train_images_path, train_labels_path, test_images_path, test_labels_path]
+file_paths = [train_images_path, train_labels_path]
 if not verify_files_exist(file_paths):
     st.stop()
 
@@ -84,13 +84,13 @@ def load_emnist(images_path, labels_path):
 try:
     # Load the dataset
     x_train_emnist, y_train_emnist = load_emnist(train_images_path, train_labels_path)
-    x_test_emnist, y_test_emnist = load_emnist(test_images_path, test_labels_path)
+    # x_test_emnist, y_test_emnist = load_emnist(test_images_path, test_labels_path)
     
     # Debugging statements
     st.write(f"x_train_emnist shape: {x_train_emnist.shape}")
     st.write(f"y_train_emnist shape: {y_train_emnist.shape}")
-    st.write(f"x_test_emnist shape: {x_test_emnist.shape}")
-    st.write(f"y_test_emnist shape: {y_test_emnist.shape}")
+    # st.write(f"x_test_emnist shape: {x_test_emnist.shape}")
+    # st.write(f"y_test_emnist shape: {y_test_emnist.shape}")
 except Exception as e:
     st.error(f"An error occurred while loading the dataset: {e}")
     st.stop()
@@ -109,18 +109,18 @@ x_train_mnist, y_train_mnist = preprocess_data(x_train_mnist, y_train_mnist)
 x_test_mnist, y_test_mnist = preprocess_data(x_test_mnist, y_test_mnist)
 
 x_train_emnist, y_train_emnist = preprocess_data(x_train_emnist, y_train_emnist)
-x_test_emnist, y_test_emnist = preprocess_data(x_test_emnist, y_test_emnist)
+# x_test_emnist, y_test_emnist = preprocess_data(x_test_emnist, y_test_emnist)
 # Shift EMNIST labels to avoid collision with MNIST labels (0-9)
 y_train_emnist += 9
-y_test_emnist += 9
+# y_test_emnist += 9
 
 # Combine datasets for training
 x_train = np.concatenate([x_train_mnist, x_train_emnist], axis=0)
 y_train = np.concatenate([y_train_mnist, y_train_emnist], axis=0)
 
 # Combine datasets for testing
-x_test = np.concatenate([x_test_mnist, x_test_emnist], axis=0)
-y_test = np.concatenate([y_test_mnist, y_test_emnist], axis=0)
+x_test = np.concatenate([x_test_mnist], axis=0)
+y_test = np.concatenate([y_test_mnist], axis=0)
 
 # Load the model
 model_path = 'digit_letter_classifier.h5'
