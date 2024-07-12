@@ -9,13 +9,13 @@ from streamlit_drawable_canvas import st_canvas
 from PIL import Image
 
 # URLs of the dataset files on Google Drive
-images_url = 'https://drive.google.com/uc?export=download&id=1eKJDJ1O8sMU-nKYCDBmA_hSXxHkCaGQ5'
-labels_url = 'https://drive.google.com/uc?export=download&id=1eKJDJ1O8sMU-nKYCDBmA_hSXxHkCaGQ5'
+train_images_url = 'https://drive.google.com/uc?export=download&id=1eKJDJ1O8sMU-nKYCDBmA_hSXxHkCaGQ5'
+train_labels_url = 'https://drive.google.com/uc?export=download&id=<train_labels_id>'
 test_images_url = 'https://drive.google.com/uc?export=download&id=<test_images_id>'
 test_labels_url = 'https://drive.google.com/uc?export=download&id=<test_labels_id>'
 
-images_path = 'emnist-letters-train-images-idx3-ubyte'
-labels_path = 'emnist-letters-train-labels-idx1-ubyte'
+train_images_path = 'emnist-letters-train-images-idx3-ubyte'
+train_labels_path = 'emnist-letters-train-labels-idx1-ubyte'
 test_images_path = 'emnist-letters-test-images-idx3-ubyte'
 test_labels_path = 'emnist-letters-test-labels-idx1-ubyte'
 
@@ -38,13 +38,13 @@ def download_file_from_google_drive(url, destination):
             f.write(chunk)
 
 # Download the files if they do not exist
-if not os.path.exists(images_path):
+if not os.path.exists(train_images_path):
     with st.spinner("Downloading train images file..."):
-        download_file_from_google_drive(images_url, images_path)
+        download_file_from_google_drive(train_images_url, train_images_path)
 
-if not os.path.exists(labels_path):
+if not os.path.exists(train_labels_path):
     with st.spinner("Downloading train labels file..."):
-        download_file_from_google_drive(labels_url, labels_path)
+        download_file_from_google_drive(train_labels_url, train_labels_path)
 
 if not os.path.exists(test_images_path):
     with st.spinner("Downloading test images file..."):
@@ -62,7 +62,7 @@ def verify_files_exist(file_paths):
             return False
     return True
 
-file_paths = [images_path, labels_path, test_images_path, test_labels_path]
+file_paths = [train_images_path, train_labels_path, test_images_path, test_labels_path]
 if not verify_files_exist(file_paths):
     st.stop()
 
@@ -83,7 +83,7 @@ def load_emnist(images_path, labels_path):
 
 try:
     # Load the dataset
-    x_train_emnist, y_train_emnist = load_emnist(images_path, labels_path)
+    x_train_emnist, y_train_emnist = load_emnist(train_images_path, train_labels_path)
     x_test_emnist, y_test_emnist = load_emnist(test_images_path, test_labels_path)
     
     # Debugging statements
